@@ -1,0 +1,188 @@
+    body {
+      background: #0d1117;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .btn {
+      background: #1e1e26;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+    #content {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 3rem);
+      overflow: auto;
+    }
+    .category-block {
+      position: absolute;
+      background: #1e1e26;
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: default;
+      min-width: 80px;
+    }
+    .category-title {
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #ededed;
+      margin: 0 0 0.5rem;
+      cursor: grab;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(64px,1fr));
+      gap: 0.75rem;
+    }
+    .tile {
+      position: relative;
+      width: 64px;
+      cursor: pointer;
+    }
+    .tile-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .tile-image {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .tile-image:hover { background: rgba(255,255,255,0.2); }
+    .tile-image img { width: 32px; height: 32px; }
+    .tile-title {
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+      width: 64px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      color: #fff;
+    }
+    .edit-btn {
+      display: none;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 0.75rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transform: scaleX(-1);
+    }
+    body.edit-mode .tile:hover .edit-btn {
+    display: flex;
+    }
+    body.edit-mode .edit-cat-btn {
+      position: absolute;
+      top: 8px;
+      right: 36px;
+      width: 20px;
+      height: 20px;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 20px;
+    }
+    body.edit-mode .edit-cat-btn::before { content: '⚙'; }
+    body.edit-mode .category-block:hover .edit-cat-btn { display: flex; }
+    body.edit-mode .resize-handle {
+      display: none;
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 2px;
+      cursor: ew-resize;
+      bottom: 8px;
+      right: 8px;
+      z-index: 100;       
+    }
+    .add-link-btn {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      top: 8px;
+      right: 8px;
+      line-height: 20px;
+      z-index: 100; 
+    }
+    body.edit-mode .add-link-btn::before { content: '+'; }
+    body.edit-mode .category-block:hover .resize-handle { display: block; }
+    body.edit-mode .category-block:hover .add-link-btn { display: flex; }
+    .category-block.phantom-outline {
+      background: transparent;
+    }
+
+    /* Guides */
+    .guide-line { pointer-events: none; }
+
+    /* Bootstrap modal overrides (dark dialog) */
+    .modal-content.bg-dark { background: #2e2e3e; }
+    /* hide all controls by default */
+
+
+
+/* 1) Hide _everything_ when NOT in edit-mode */
+body:not(.edit-mode) .edit-btn,
+body:not(.edit-mode) .edit-cat-btn,
+body:not(.edit-mode) .add-link-btn,
+body:not(.edit-mode) .resize-handle {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* 2) In edit-mode, show them on hover exactly as before */
+body.edit-mode .tile:hover .edit-btn,
+body.edit-mode .category-block:hover .edit-cat-btn,
+body.edit-mode .category-block:hover .add-link-btn {
+  display: flex !important;      /* use block or inline-flex if that’s your normal display */
+  pointer-events: auto !important;
+}
+
+body.edit-mode .category-block:hover .resize-handle {
+  display: block !important;     /* or flex, as you prefer */
+  pointer-events: auto !important;
+}

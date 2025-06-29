@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>My Start Page</title>
+
+  <!-- Local Bootstrap CSS -->
+  <link
+    href="css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="css/styles.css"
+    rel="stylesheet"
+  />
+
+</head>
+<body>
+  <div class="top-bar">
+    <button id="importBtn" class="btn">Import</button>
+    <input type="file" id="fileInput" accept="application/json" hidden>
+    <button id="addCategoryBtn" class="btn">＋ Category</button>
+    <button id="toggleEditBtn" class="btn">Edit</button>
+    <button id="exportBtn" class="btn">Export</button>
+  </div>
+
+  <div id="content"></div>
+
+  <!-- Link Modal -->
+  <div id="linkModal" class="modal fade" tabindex="-1" data-bs-theme="dark">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 id="modalTitle" class="modal-title">Add Link</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="linkForm" class="p-3">
+          <input type="hidden" id="linkId">
+          <div class="mb-2">
+            <label for="linkTitle" class="form-label">Title</label>
+            <input type="text" id="linkTitle" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label for="linkUrl" class="form-label">URL</label>
+            <input type="url" id="linkUrl" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label for="linkIcon" class="form-label">Icon URL</label>
+            <input type="url" id="linkIcon" class="form-control">
+          </div>
+          <input type="hidden" id="linkCategory">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+            <button type="button" class="btn btn-danger btn-delete">Delete</button>
+            <button type="submit" class="btn btn-success btn-save">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div id="categoryModal" class="modal fade" tabindex="-1" data-bs-theme="dark">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Category</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="categoryForm" class="p-3">
+          <input type="hidden" id="categoryIdx">
+          <div class="mb-2">
+            <label for="categoryName" class="form-label">Category Name</label>
+            <input type="text" id="categoryName" class="form-control" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-cancel-cat">Cancel</button>
+            <button type="button" class="btn btn-danger btn-delete-cat">Delete</button>
+            <button type="submit" class="btn btn-success btn-save-cat">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Bootstrap JS Bundle -->
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <!-- Your application logic -->
+  <script src="js/script.js" defer></script>
+</body>
+</html>
