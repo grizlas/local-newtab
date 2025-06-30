@@ -10,6 +10,7 @@ const FALLBACK_TILE_HEIGHT  = 100;   // px if no links to measure
 let links = [];
 let categories = [];
 let defaultTileHeight = 0;
+let editMode = false;
 
 // --- DOM refs ---
 const fileInput        = document.getElementById('fileInput');
@@ -21,21 +22,40 @@ const deleteBtn        = linkModalEl.querySelector('.btn-delete');
 const catDeleteBtn     = categoryModalEl.querySelector('.btn-delete-cat');
 const linkCancelBtn    = linkModalEl.querySelector('.btn-cancel');
 const catCancelBtn     = categoryModalEl.querySelector('.btn-cancel-cat');
+const toggleEditBtn    = document.getElementById('toggleEditBtn');
 
 // Instantiate Bootstrap modals
 const bsLinkModal = new bootstrap.Modal(linkModalEl);
 const bsCatModal  = new bootstrap.Modal(categoryModalEl);
 
-// --- global edit-mode toggle ---
-let editMode = false;
-const toggleEditBtn = document.getElementById('toggleEditBtn');
+const linkIconFileInput    = document.getElementById('linkIconFile');
+const linkClearIconCheckbox = document.getElementById('linkClearIcon');
 
+let pendingIconDataUrl = null;
+let originalIconDataUrl = null;
+
+linkIconFileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) {
+    pendingIconDataUrl = null;
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingIconDataUrl = reader.result;  // data:image/png;base64,...
+  };
+  reader.readAsDataURL(file);
+});
+
+// --- global edit-mode toggle ---
 toggleEditBtn.addEventListener('click', () => {
   editMode = !editMode;
-  // add/remove class on <body>
   document.body.classList.toggle('edit-mode', editMode);
-  // update button text
   toggleEditBtn.textContent = editMode ? 'Done' : 'Edit';
+  // update existing tiles to be draggable or not
+  document.querySelectorAll('.tile').forEach(tile => {
+    tile.draggable = editMode;
+  });
 });
 
 // --- Helpers ---
@@ -215,14 +235,16 @@ function render() {
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.dataset.id = l.id;
-      tile.setAttribute('draggable', 'true');
+      tile.draggable = editMode; // only draggable in edit mode
+
       tile.addEventListener('dragstart', e => {
+        if (!editMode) { e.preventDefault(); return; }
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', l.id);
       });
-
-      const icon = l.icon ||
-        `https://www.google.com/s2/favicons?domain=${new URL(l.url).hostname}&sz=64`;
+      const icon = l.icon 
+        ? l.icon 
+        : `https://www.google.com/s2/favicons?domain=${new URL(l.url).hostname}&sz=64`;
 
       tile.innerHTML = `
         <a class="tile-link" href="${l.url}" target="_blank">
@@ -236,9 +258,13 @@ function render() {
     });
     block.appendChild(grid);
 
-    // Drop support
-    block.addEventListener('dragover', e => e.preventDefault());
+    // Drop support (only in edit mode)
+    block.addEventListener('dragover', e => {
+      if (!editMode) return;
+      e.preventDefault();
+    });
     block.addEventListener('drop', e => {
+      if (!editMode) return;
       e.preventDefault();
       const id   = e.dataTransfer.getData('text/plain');
       const link = links.find(l => l.id == id);
@@ -250,7 +276,7 @@ function render() {
 
     content.appendChild(block);
 
-    // Enable dragging and resizing
+    // Enable dragging and resizing (only in edit mode)
     makePhantomDraggable(block, title, cat);
     makeResizable(block, rh, cat);
   });
@@ -275,6 +301,7 @@ function attachTileEvents() {
 // --- Phantom drag with Smart Guides & Uniform Spacing ---
 function makePhantomDraggable(el, handle, cat) {
   handle.onmousedown = e => {
+    if (!editMode) return;       // only in edit mode
     e.preventDefault();
     const content = document.getElementById('content');
     const startX  = e.clientX, startY = e.clientY;
@@ -344,10 +371,10 @@ function makePhantomDraggable(el, handle, cat) {
 
       // uniform spacing Y
       const tops    = others.filter(o => o.y + o.h <= candY);
-      const bottoms= others.filter(o => o.y >= candY + h);
+      const bottoms = others.filter(o => o.y >= candY + h);
       if (tops.length && bottoms.length) {
         const top    = tops.reduce((a,b) => (a.y+a.h)>(b.y+b.h)?a:b);
-        const bottom= bottoms.reduce((a,b)=> a.y<b.y?a:b);
+        const bottom = bottoms.reduce((a,b) => a.y<b.y?a:b);
         const gapT   = candY - (top.y + top.h);
         const gapB   = bottom.y - (candY + h);
         if (Math.abs(gapT - gapB) < SPACING_TOLERANCE) {
@@ -402,6 +429,7 @@ function makePhantomDraggable(el, handle, cat) {
 // --- Resizable ---
 function makeResizable(el, handle, cat) {
   handle.onmousedown = e => {
+    if (!editMode) return;    // only in edit mode
     e.preventDefault();
     const startX = e.clientX, origW = el.offsetWidth;
     function onMove(ev) {
@@ -536,19 +564,41 @@ catDeleteBtn.onclick = e => {
 
 form.onsubmit = e => {
   e.preventDefault();
+
   const idVal = document.getElementById('linkId').value;
+
+  let iconValue;
+  if (linkClearIconCheckbox.checked) {
+    // user asked to remove any custom icon
+    iconValue = null;
+  } else if (pendingIconDataUrl) {
+    // user uploaded a new PNG this session
+    iconValue = pendingIconDataUrl;
+  } else {
+    // keep whatever was there before (could be null or a previous data URL)
+    iconValue = originalIconDataUrl;
+  }
+
   const newLink = {
-    id: idVal || Date.now(),
-    title: document.getElementById('linkTitle').value,
-    url:   document.getElementById('linkUrl').value,
-    icon:  document.getElementById('linkIcon').value,
+    id:       idVal || Date.now(),
+    title:    document.getElementById('linkTitle').value,
+    url:      document.getElementById('linkUrl').value,
+    icon:     iconValue,
     category: document.getElementById('linkCategory').value
   };
+
   if (idVal) {
-    links = links.map(l => (l.id == newLink.id ? newLink : l));
+    links = links.map(l => l.id == newLink.id ? newLink : l);
   } else {
     links.push(newLink);
   }
+
+  // reset temporary state
+  pendingIconDataUrl = null;
+  originalIconDataUrl = null;
+  linkIconFileInput.value = '';
+  linkClearIconCheckbox.checked = false;
+
   bsLinkModal.hide();
   render();
 };
@@ -570,14 +620,21 @@ catForm.onsubmit = e => {
 function openModal(titleText, link = {}, lockCat = false) {
   document.getElementById('modalTitle').textContent = titleText;
   form.reset();
+
+  // remember the original icon (could be a data URL or null)
+  originalIconDataUrl    = link.icon || null;
+  pendingIconDataUrl     = null;
+  linkIconFileInput.value = '';
+  linkClearIconCheckbox.checked = false;
+
   document.getElementById('linkId').value    = link.id || '';
   document.getElementById('linkTitle').value = link.title || '';
   document.getElementById('linkUrl').value   = link.url || '';
-  document.getElementById('linkIcon').value  = link.icon || '';
   const catInput = document.getElementById('linkCategory');
   catInput.value    = link.category || categories[0]?.name || '';
   catInput.disabled = lockCat;
   deleteBtn.style.display = link.id ? 'inline-block' : 'none';
+
   bsLinkModal.show();
 }
 
