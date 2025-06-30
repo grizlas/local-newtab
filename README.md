@@ -1,13 +1,13 @@
 # Local New Tab
 
-A simple Brave (and Chrome-compatible) extension that replaces your New Tab page with a customizable dashboard of links organized into draggable, resizable categories. Add, edit, import, and export your link layout as JSON.
+A simple Brave (and Chrome-compatible) extension that replaces your New Tab page with a customizable dashboard of links organized into draggable, resizable categories. Add, edit, import, and export your link layout as JSON—and now upload custom icons for your links or clear them as needed.
 
 ---
 
 ## Features
 
 - **Custom New Tab**  
-  Replaces the browser’s default New Tab page with your own dashboard.
+  Replaces the browser’s default New Tab page with your own link dashboard.
 
 - **Categories & Tiles**  
   • Create named categories (blocks) to group related links.  
@@ -18,12 +18,17 @@ A simple Brave (and Chrome-compatible) extension that replaces your New Tab page
   • Resize categories to control how many columns/rows of tiles they display.
 
 - **Edit Mode**  
-  • Toggle **Edit** mode to reveal controls.  
+  • Toggle **Edit** mode to reveal category and link controls.  
   • In edit mode, hover over a category to show ⚙ **Edit Category**, ➕ **Add Link**, and ↔️ **Resize Handle**.  
   • Hover over any tile to show ✎ **Edit Link**.
 
+- **Custom Icon Upload & Removal**  
+  • Upload a `.png` file directly in the **Add/Edit Link** modal to use as a custom favicon.  
+  • If no custom image is provided, the extension falls back to Google’s favicon service.  
+  • A **Remove custom icon** checkbox lets you clear a previously uploaded icon and revert to the fallback.
+
 - **Import & Export**  
-  • **Export** your entire configuration (categories, positions, tile URLs/titles) to a JSON file.  
+  • **Export** your entire configuration (categories, positions, tile URLs/titles/icons) to a JSON file.  
   • **Import** a JSON file to restore or share your setup.
 
 ---
@@ -53,22 +58,27 @@ A simple Brave (and Chrome-compatible) extension that replaces your New Tab page
 1. **Enter Edit Mode**  
    Click the **Edit** button in the top toolbar. It will change to **Done**.
 
-2. **Manage Categories**  
+2. **Add or Edit Links**  
+   - In a category, click ➕ **Add Link** or hover a tile and click ✎ **Edit Link**.  
+   - In the modal, fill in **Title** and **URL**.  
+   - **Upload PNG (optional)**: select a `.png` file to use as the tile icon.  
+   - **Remove custom icon**: check this box to clear any previously uploaded image and revert to the default favicon.
+
+3. **Manage Categories**  
    - Hover over a category block to reveal:  
-     - ⚙ **Edit Category**: Change the category name or delete it.  
-     - ➕ **Add Link**: Open the “Add Link” dialog.  
-     - ↔️ **Resize Handle**: Drag to resize the block.
+     - ⚙ **Edit Category**: rename or delete an empty category.  
+     - ↔️ **Resize Handle**: drag to resize the block.
 
-3. **Manage Tiles**  
-   - Hover over any link tile to reveal ✎ **Edit Link**: Change its title or URL, or remove it.  
-   - Drag tiles within a category to reorder them.
+4. **Drag & Reorder**  
+   - While in edit mode, drag categories to reposition them.  
+   - Drag tiles between categories to move links.
 
-4. **Import / Export Layout**  
-   - **Export**: Click the Export button in the top toolbar to download your dashboard as a `.json` file.  
-   - **Import**: Click the Import button, select a previously exported `.json`, and your layout will be restored.
+5. **Import / Export Layout**  
+   - **Export**: Click the Export button to download your dashboard as a `.json`.  
+   - **Import**: Click Import and select a previously exported `.json` to restore.
 
-5. **Exit Edit Mode**  
-   Click **Done** (formerly **Edit**) to hide controls and return to normal browsing.
+6. **Exit Edit Mode**  
+   Click **Done** to hide controls and return to normal browsing.
 
 ---
 
@@ -79,18 +89,18 @@ A simple Brave (and Chrome-compatible) extension that replaces your New Tab page
    git clone https://github.com/grizlas/local-newtab.git
    cd local-newtab
    ```
-2. **Edit source files** in your favorite editor:  
+2. **Edit source files** in your favorite editor:
    - `manifest.json`  
    - `my-homepage.html`  
-   - `styles.css`  
-   - `script.js`
+   - `css/styles.css`  
+   - `js/script.js`
 
-3. **Reload the extension** in `brave://extensions` (or `chrome://extensions`) after any changes.
+3. **Reload** the extension in `brave://extensions` (or `chrome://extensions`) after any changes.
 
-4. **Commit & push**:  
+4. **Commit & Push** your changes:
    ```bash
    git add .
-   git commit -m "Describe your changes"
+   git commit -m "Add custom icon upload/removal feature"
    git push
    ```
 
